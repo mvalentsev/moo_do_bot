@@ -54,7 +54,7 @@ async function updateMessage(KV, env) {
                 {
                     "parts": [
                         {
-                            "text": prompts[Math.floor(Math.random() * prompts.length)];
+                            "text": prompts[Math.floor(Math.random() * prompts.length)]
                         }
                     ]
                 }
