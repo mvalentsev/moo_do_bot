@@ -50,15 +50,11 @@ async function updateMessage(KV, env) {
         ];
 
         const payload = {
-            "contents": [
-                {
-                    "parts": [
-                        {
-                            "text": prompts[Math.floor(Math.random() * prompts.length)]
-                        }
-                    ]
-                }
-            ]
+            "contents": [{
+                "parts": [{
+                    "text": prompts[Math.floor(Math.random() * prompts.length)]
+                }]
+            }]
         };
 
         const response = await fetch(apiUrl, {
