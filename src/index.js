@@ -10,7 +10,7 @@ class SiteMonitor {
         this.env = env;
         this.kv = env.CACHE;
         this.telegramApi = `https://api.telegram.org/bot${env.BOT_TOKEN}/sendMessage`;
-        this.muteDuration = 0 * 60 * 1000; // 60 минут
+        this.muteDuration = 60 * 60 * 1000; // 60 минут
         this.timeout = 10000; // 10 секунд таймаут
     }
 
