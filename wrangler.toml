@@ -5,6 +5,9 @@ compatibility_date = "2025-06-10"
 [triggers]
 crons = ["*/1 * * * *"]
 
+[observability.logs]
+enabled = true
+
 [[kv_namespaces]]
 binding = "CACHE"
 id = "your-kv-id"
