@@ -9,6 +9,7 @@ class SiteMonitor {
     constructor(env) {
         this.env = env;
         this.kv = env.CACHE;
+        this.ai = env.AI;
         this.telegramApi = `https://api.telegram.org/bot${env.BOT_TOKEN}/sendMessage`;
         this.muteDuration = 60 * 60 * 1000; // 60 минут
         this.timeout = 10000; // 10 секунд таймаут
@@ -148,37 +149,42 @@ class SiteMonitor {
             "Ты недовольный системный администратор. Сайт снова недоступен. Выскажись ОДНИМ язвительным предложением команде на русском. Используй сарказм и профессиональный цинизм.",
             "Ты мониторинг-бот с характером. Опять проблемы с сервером. Сделай ОДНО саркастичное замечание разработчикам на русском языке. Будь остроумно злым.",
             "Ты опытный DevOps с черным юмором. Сервер сломался. Напиши ОДНУ едкую фразу для команды на русском. Используй профессиональный сарказм.",
-            "Ты раздраженный SRE-инженер. Сайт опять упал. Выдай ОДНО язвительное предложение разработчикам на русском языке. Будь саркастичным профессионалом."
+            "Ты старый DevOps с багажом знаний. Очередной инцидент. Напиши ОДНУ ироничную фразу на русском для команды разработки. Покажи профессиональную усталость от багов."
         ];
 
         try {
-            const response = await fetch(
-                `https://generativelanguage.googleapis.com/v1beta/models/gemma-3n-e4b-it:generateContent?key=${this.env.GEMINI_API_KEY}`,
-                {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        contents: [{
-                            parts: [{
-                                text: prompts[Math.floor(Math.random() * prompts.length)]
-                            }]
-                        }]
-                    })
-                }
-            );
+            const systemPrompt = "Ты опытный DevOps-инженер с язвительным чувством юмора. Отвечай ТОЛЬКО на русском языке. Используй профессиональный IT-сленг и сарказм. Ответ должен быть ОДНИМ предложением, максимум 150 символов.";
+            const userPrompt = prompts[Math.floor(Math.random() * prompts.length)];
 
-            if (!response.ok) {
-                throw new Error(`API error: ${response.status}`);
-            }
+            const response = await this.ai.run('@cf/meta/llama-4-scout-17b-16e-instruct', {
+                messages: [
+                    { role: "system", content: systemPrompt },
+                    { role: "user", content: userPrompt }
+                ],
+                max_tokens: 100,
+                temperature: 0.9,
+                top_p: 0.95
+            });
 
-            const data = await response.json();
-            const message = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
-
-            return this.sanitizeMessage(message);
-
+            const message = response?.response?.trim();
+            return message ? this.sanitizeMessage(message) : this.getRandomFallbackMessage();
         } catch (error) {
-            console.error("Ошибка генерации сообщения:", error);
-            return this.getRandomFallbackMessage();
+            console.error("Ошибка генерации сообщения с Cloudflare AI:", error);
+
+            // Пробуем альтернативную модель
+            try {
+                const response = await this.ai.run('@cf/mistral/mistral-7b-instruct-v0.1', {
+                    prompt: "Ты язвительный DevOps. Сервер упал. Одно саркастичное предложение на русском:",
+                    max_tokens: 80,
+                    temperature: 0.8
+                });
+
+                const message = response?.response?.trim();
+                return message ? this.sanitizeMessage(message) : this.getRandomFallbackMessage();
+            } catch (fallbackError) {
+                console.error("Ошибка fallback модели:", fallbackError);
+                return this.getRandomFallbackMessage();
+            }
         }
     }
 
@@ -201,7 +207,10 @@ class SiteMonitor {
             "Хорошие новости: сервер работает! Плохие новости: в параллельной вселенной.",
             "Сайт недоступен. Но зато как красиво недоступен!",
             "Сервер показывает класс. Мастер-класс по падению.",
-            "500-я ошибка — это не баг, это фича! Очень дорогая фича."
+            "500-я ошибка — это не баг, это фича! Очень дорогая фича.",
+            "Сервер ушел в отпуск без предупреждения. Видимо, выгорел.",
+            "Код работает по принципу 'иногда да, иногда нет'. Сегодня — нет.",
+            "Мониторинг показывает: все плохо. Как обычно."
         ];
 
         return fallbacks[Math.floor(Math.random() * fallbacks.length)];

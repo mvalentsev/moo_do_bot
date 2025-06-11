@@ -1,12 +1,16 @@
 name = "moo_do_bot"
 main = "src/index.js"
 compatibility_date = "2025-06-10"
+workers_dev = false
 
 [triggers]
 crons = ["*/1 * * * *"]
 
 [observability.logs]
 enabled = true
+
+[ai]
+binding = "AI"
 
 [[kv_namespaces]]
 binding = "CACHE"
