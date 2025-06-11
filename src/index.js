@@ -153,7 +153,7 @@ class SiteMonitor {
 
         try {
             const response = await fetch(
-                `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${this.env.GEMINI_API_KEY}`,
+                `https://generativelanguage.googleapis.com/v1beta/models/gemma-3n-e4b-it:generateContent?key=${this.env.GEMINI_API_KEY}`,
                 {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -162,12 +162,7 @@ class SiteMonitor {
                             parts: [{
                                 text: prompts[Math.floor(Math.random() * prompts.length)]
                             }]
-                        }],
-                        generationConfig: {
-                            temperature: 0.9,
-                            maxOutputTokens: 100,
-                            topP: 0.95
-                        }
+                        }]
                     })
                 }
             );
