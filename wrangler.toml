@@ -1,0 +1,16 @@
+name = "moo_do_bot"
+main = "src/index.js"
+compatibility_date = "2025-06-10"
+
+[triggers]
+crons = ["*/1 * * * *"]
+
+[[kv_namespaces]]
+binding = "CACHE"
+id = "your-kv-id"
+
+[vars]
+URL = "https://your-website-to-monitor.com/"
+BOT_TOKEN = "your-telegram-bot-token"
+CHAT_ID = "your-telegram-chat-id"
+GEMINI_API_KEY = "your-gemini-api-key"
